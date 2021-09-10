@@ -1,0 +1,42 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fibo-svc
+  labels:
+    app: fibo
+spec:
+  ports:
+    - port: 8080
+      name: http
+  selector:
+    app: fibo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fibo
+spec:
+  selector:
+    matchLabels:
+      app: fibo
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: fibo
+        track: stable
+    spec:
+      containers:
+        - name: fibo
+          image: robeevanjava/fibo:1
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "200m"
+            limits:
+              memory: "258Mi"
+              cpu: "800m"

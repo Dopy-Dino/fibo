@@ -1,0 +1,28 @@
+---
+stages:
+  - test-stage
+  - build-stage
+
+test-job:
+  stage: test-stage
+  tags:
+    - robee-runner
+  image: python:3-alpine3.13
+  before_script:
+    - apk add git
+    - git config --global url."https://${CI_JOB_GITUSER}:${CI_JOB_GITTOKEN}@gitlab.com".insteadOf "https://gitlab.com"
+    - pip install virtualenv
+    - virtualenv ~/venv
+    - source ~/venv/bin/activate
+    - pip install -Ur requirements.txt
+    - pip install coverage
+  script:
+    - coverage run --source . --omit test.* -m test
+    - coverage report
+    - coverage xml
+    - ls -lrt
+  artifacts:
+    reports:
+      cobertura: coverage.xml
+
+...
